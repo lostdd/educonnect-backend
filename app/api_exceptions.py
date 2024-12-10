@@ -24,7 +24,7 @@ ForbiddenException = HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail
 
 AccountAlreadyActivatedException = HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Аккаунт уже активирован')
 
-AccountNotActivatedException = HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Аккаунт не активирован или отключен')
+AccountNotActivatedException = HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Аккаунт не активирован или отключен')
 
 AccountDisabledException = HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Аккаунт не активирован или отключен')
 

@@ -1,9 +1,10 @@
-from app.dao.base import BaseDAO
-from app.auth.models import User
-
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.dao.base import BaseDAO
+from app.auth.models import User
+
 
 class UserDAO(BaseDAO):
     model = User
@@ -17,7 +18,7 @@ class UserDAO(BaseDAO):
             query = select(cls.model).filter(or_(cls.model.login == login, cls.model.telegram_id == telegram_id))
             result = await session.execute(query)
             record = result.scalars().all()
-            return True if record else False
+            return bool(record)
             # return record
         except SQLAlchemyError as e:
-            raise
+            raise e

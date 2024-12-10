@@ -10,6 +10,8 @@ class Login(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 class UserBase(Login):
+    name: str
+    surname: str
     telegram_id: int = Field(description="ID аккаунта Telegram")
 
 class UserExt(UserBase):
@@ -31,18 +33,22 @@ class UserActivate(Login):
 
 class UserResetPassword(UserAuth):
     reset_token: str = Field(description="Служебный секретный токен для активации аккаунта и сброса пароля")
-                          
+
 class UserReg(UserBase):
     password: str = Field(min_length=settings.PASSWORD_MIN_LENGTH,
                           max_length=settings.PASSWORD_MAX_LENGTH,
                           description="Пароль; длина задается директивами settings.PASSWORD_MIN_LENGTH и settings.PASSWORD_MAX_LENGTH")
+
+class UserPut(BaseModel):
+    name: str
+    surname: str
 
 class RoleModel(BaseModel):
     id: int = Field(description="Идентификатор роли")
     name: str = Field(description="Название роли")
     model_config = ConfigDict(from_attributes=True)
 
-class UserInfo(UserBase):
+class UserInfo(UserExt):
     id: int = Field(description="Идентификатор пользователя")
     role: RoleModel = Field(exclude=True)
 

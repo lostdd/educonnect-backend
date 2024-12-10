@@ -8,7 +8,7 @@ from fastapi.security import OAuth2PasswordBearer
 
 from app.dao.session import SessionDep
 from app.auth.dao import UserDAO
-from app.auth.pydantic_models import UserExt
+from app.auth.pydantic_models import UserInfo
 
 from app import api_exceptions
 
@@ -20,16 +20,18 @@ settings = get_settings()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
+
 def get_token(request: Request):
     token = request.cookies.get('api_access_token')
     if not token:
         raise api_exceptions.TokenNotFound
     return token
 
+
 async def get_current_user(
         token: Annotated[str, Depends(get_token)],
         session: SessionDep
-    ) -> UserExt:
+    ) -> UserInfo:
     try:
         payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGHORITHM])
         expire: str = payload.get('exp')
@@ -46,15 +48,28 @@ async def get_current_user(
     user = await UserDAO.find_one_or_none(session, FilterModel(id=user_id))
     if not user:
         raise api_exceptions.NoUserIdException
-    return UserExt.model_validate(user)
+    return UserInfo.model_validate(user)
 
 
 async def get_current_active_user(
-    current_user: Annotated[UserExt, Depends(get_current_user)],
-) -> UserExt:
+    current_user: Annotated[UserInfo, Depends(get_current_user)],
+) -> UserInfo:
     if current_user.disabled:
         raise api_exceptions.AccountDisabledException
     elif not current_user.completed_registration:
         raise api_exceptions.AccountNotActivatedException
     return current_user
 
+
+async def get_current_user_with_role(current_user: UserInfo, role_ids: list[int]):
+    if current_user.role.id in role_ids:
+        return current_user
+    raise api_exceptions.ForbiddenException
+
+
+async def get_current_teacher_user(current_user: UserInfo = Depends(get_current_user)):
+    return get_current_user_with_role(current_user, [4])
+
+
+async def get_current_admin_user(current_user: UserInfo = Depends(get_current_user)):
+    return get_current_user_with_role(current_user, [5, 6])

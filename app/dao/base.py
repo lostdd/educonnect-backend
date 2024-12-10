@@ -1,8 +1,11 @@
-from typing import List, Any, Dict, Generic, TypeVar
+from typing import List, Generic, TypeVar
+
+from sqlalchemy import select, delete, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from pydantic import BaseModel
-from sqlalchemy import select
+
 from app.dao.database import Base
 
 # Объявляем типовой параметр T с ограничением, что это наследник pydantic.Base
