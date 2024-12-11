@@ -5,19 +5,15 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.dao.database import Base
 from app.auth.models import User
 
-
-class TaskStatusEnum(enum.StrEnum):
-    PENDING = "Отложена"
-    IN_PROGRESS = "В процессе"
-    COMPLETED = "Завершена"
+from app.projects.pydantic_models import TaskStatusEnum
 
 
 class Label(Base):
     __tablename__ = "labels"
     name: Mapped[str] = mapped_column(String(64), unique=True)
-    courses: Mapped[list["Course"]] = relationship(
-        secondary="courses_tags",
-        back_populates="tags"
+    tasks: Mapped[list["Task"]] = relationship(
+        secondary="tasks_labels",
+        back_populates="labels"
     )
 
 
@@ -44,6 +40,7 @@ class Comment(Base):
     user: Mapped["User"] = relationship(
         "User",
         back_populates="comments",
+        uselist=False,
         lazy="joined"
     )
 
@@ -63,11 +60,16 @@ class Task(Base):
     title: Mapped[str]
     description: Mapped[str]
     status: Mapped[TaskStatusEnum] = mapped_column(
-        default=TaskStatusEnum.PENDING,
+        default=TaskStatusEnum.PENDING.name,
         server_default=text("'PENDING'")
     )
     comments: Mapped[list["Comment"]] = relationship(
         "Comment",
+        back_populates="task",
+        lazy="joined"
+    )
+    labels: Mapped[list["Label"]] = relationship(
+        secondary="tasks_labels",
         back_populates="tasks",
         lazy="joined"
     )
@@ -78,21 +80,17 @@ class Project(Base):
 
     name: Mapped[str]
     description: Mapped[str]
-    labels: Mapped[list["Label"]] = relationship(
-        secondary="tasks_labels",
-        back_populates="projects",
-        lazy="joined"
-    )
 
     owner_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
     owner: Mapped["User"] = relationship(
         "User",
         back_populates="projects",
+        uselist=False,
         lazy="joined"
     )
 
     tasks: Mapped[list["Task"]] = relationship(
         "Task",
-        back_populates="projects",
+        back_populates="project",
         lazy="joined"
     )

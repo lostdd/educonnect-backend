@@ -4,7 +4,6 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class AppSettings(BaseSettings):
     
-    
     BASE_DIR: str = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
     # app_name: str = "Awesome API"
@@ -15,7 +14,7 @@ class AppSettings(BaseSettings):
 
     DATABASE_URL: str = None
 
-    # TELEGRAM_BOT_TOKEN: str = None
+    TELEGRAM_BOT_TOKEN: str = None
 
     PASSWORD_CHECK: bool = True
     PASSWORD_MIN_LENGTH: int = 16

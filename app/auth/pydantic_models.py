@@ -1,8 +1,19 @@
+import enum
+
 from pydantic import BaseModel, Field, ConfigDict, computed_field
 
 from app.settings import get_settings
 
 settings = get_settings()
+
+
+class RoleEnum(str, enum.Enum):
+    USER = "Пользователь"
+    RESERVED = "Зарезервировано"
+    EMPLOYER = "Работодатель"
+    TEACHER = "Учитель"
+    ADMIN = "Администратор"
+    SUPERADMIN = "Суперадминистратор"
 
 
 class Login(BaseModel):
@@ -15,9 +26,9 @@ class UserBase(Login):
     telegram_id: int = Field(description="ID аккаунта Telegram")
 
 class UserExt(UserBase):
-    reset_token: str = Field(description="Служебный секретный токен для активации аккаунта и сброса пароля")
-    completed_registration: bool = False
-    disabled: bool = False
+    reset_token: str = Field(description="Служебный секретный токен для активации аккаунта и сброса пароля", exclude=True)
+    completed_registration: bool = Field(default=False, exclude=True) 
+    disabled: bool = Field(default=False, exclude=True) 
 
 class UserAddDB(UserExt):
     password: str = Field(min_length=settings.PASSWORD_MIN_LENGTH, description="Хеш-строка пароля")

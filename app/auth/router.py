@@ -8,7 +8,7 @@ from pydantic import create_model
 from app import api_exceptions
 from app.dao.session import TransactionSessionDep
 from app.auth.dao import UserDAO
-from app.auth.pydantic_models import Login, UserBase, UserAddDB, UserReg, UserAuth, UserActivate, UserResetPassword, UserPut
+from app.auth.pydantic_models import Login, UserBase, UserAddDB, UserReg, UserAuth, UserActivate, UserResetPassword, UserPut, UserInfo
 from app.auth.depends import get_current_user, get_current_active_user
 import app.auth.utils
 from app.settings import get_settings, AppSettings
@@ -28,10 +28,11 @@ async def register_user(db_session: TransactionSessionDep,
                         reg_form: UserReg
     ) -> UserBase:
     user = await UserDAO.find_if_user_exists_by_login_and_tg(db_session, login=reg_form.login, telegram_id=reg_form.telegram_id)
+    print(user)
     if user:
         raise api_exceptions.UserAlreadyExistsException
     if app_settings.PASSWORD_CHECK:
-        if app.auth.utils.password_check(reg_form.password, app_settings.PASSWORD_MIN_LENGTH)['password_ok']:
+        if not app.auth.utils.password_check(reg_form.password, app_settings.PASSWORD_MIN_LENGTH)['password_ok']:
             # Password is not OK - minimum {app_settings.password_min_length} characters required
             # raise HTTPException(status.HTTP_400_BAD_REQUEST,
             #                     detail=f'Password is not OK - minimum {app_settings.PASSWORD_MIN_LENGTH} characters without whitespaces required '
@@ -174,6 +175,6 @@ async def logout(response: Response):
     response.delete_cookie(key="api_access_token")
     return {"message": "Выход!", "ok": True}
 
-@router.get('/me', response_model=UserBase)
-async def me(user_data: UserBase = Depends(get_current_user)):
+@router.get('/me', response_model=UserInfo)
+async def me(user_data: UserInfo = Depends(get_current_user)):
     return user_data

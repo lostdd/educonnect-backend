@@ -3,7 +3,7 @@ from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dao.base import BaseDAO
-from app.auth.models import User
+from app.auth.models import User, Role
 
 
 class UserDAO(BaseDAO):
@@ -22,3 +22,6 @@ class UserDAO(BaseDAO):
             # return record
         except SQLAlchemyError as e:
             raise e
+
+class RoleDAO(BaseDAO):
+    model = Role

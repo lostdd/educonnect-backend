@@ -36,6 +36,9 @@ class User(Base):
     )
     role: Mapped["Role"] = relationship("Role", back_populates="users", lazy="joined")
 
+    projects: Mapped[list["Project"]] = relationship("Project", back_populates="owner", cascade="all, delete-orphan")
+    comments: Mapped[list["Comment"]] = relationship("Comment", back_populates="user", cascade="all, delete-orphan")
+
     # access_tokens: Mapped[list["AccessToken"]] = relationship(
     #     "AccessToken",
     #     back_populates="user",

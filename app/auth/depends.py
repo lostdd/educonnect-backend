@@ -2,8 +2,8 @@ from datetime import datetime, timezone
 from typing import Annotated
 
 from jose import jwt, JWTError
-from pydantic import create_model
-from fastapi import Depends, Request
+from pydantic import create_model, BaseModel
+from fastapi import Depends, Request, Cookie
 from fastapi.security import OAuth2PasswordBearer
 
 from app.dao.session import SessionDep
@@ -21,8 +21,13 @@ settings = get_settings()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 
-def get_token(request: Request):
-    token = request.cookies.get('api_access_token')
+class AccessTokenCookie(BaseModel):
+    api_access_token: str | None
+
+
+def get_token(cookies: Annotated[AccessTokenCookie, Cookie()]):
+    token = cookies.api_access_token
+    print(token)
     if not token:
         raise api_exceptions.TokenNotFound
     return token
@@ -56,7 +61,7 @@ async def get_current_active_user(
 ) -> UserInfo:
     if current_user.disabled:
         raise api_exceptions.AccountDisabledException
-    elif not current_user.completed_registration:
+    if not current_user.completed_registration:
         raise api_exceptions.AccountNotActivatedException
     return current_user
 
