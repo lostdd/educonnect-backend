@@ -10,12 +10,14 @@ class AppSettings(BaseSettings):
     # app_name: str = "Awesome API"
     # APP_ENV: str = "DEVELOPMENT"
 
+    BASE_URL: str = "http://localhost:8000"
+
     DOMAIN: str = None
     ROOT_URL: str = None
 
     DATABASE_URL: str = None
 
-    # TELEGRAM_BOT_TOKEN: str = None
+    TELEGRAM_BOT_TOKEN: str = "7804659295:AAGQuUuzqeeWroX_1S4OqBqSY7xED0duGzU"
 
     PASSWORD_CHECK: bool = True
     PASSWORD_MIN_LENGTH: int = 16

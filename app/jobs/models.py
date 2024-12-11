@@ -1,17 +1,14 @@
 from sqlalchemy import Column, String, Text, Float, Integer, ForeignKey
-from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy import Column, String, Text, Float, Integer, ForeignKey
 from app.dao.database import Base
-from app.auth.models import User
-
 
 class Job(Base):
     __tablename__ = "jobs"
-    id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    title: Mapped[str] = mapped_column(nullable=False)
-    description: Mapped[str] = mapped_column(Text, nullable=False)
-    requirements: Mapped[str | None] = mapped_column(Text, nullable=True)
-    salary: Mapped[float | None] = mapped_column(nullable=True)
-    phone: Mapped[str] = mapped_column(nullable=False)
+    id: int = Column(Integer, primary_key=True, index=True)
+    title: str = Column(String, nullable=False)
+    description: str = Column(Text, nullable=False)
+    requirements: str | None = Column(Text, nullable=True)
+    salary: float | None = Column(Float, nullable=True)
+    phone: str = Column(String, nullable=False)
 
-    employer_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    employer: Mapped["User"] = relationship("User", back_populates="jobs")
+    employer_id: int = Column(Integer, ForeignKey("users.id"), nullable=False)  # Только внешние ключ

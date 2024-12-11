@@ -32,8 +32,6 @@ class User(Base):
         ForeignKey('roles.id'), default=1, server_default=text("1")
     )
     role: Mapped["Role"] = relationship("Role", back_populates="users", lazy="joined")
-    jobs: Mapped[list["Job"]] = relationship("Job", back_populates="employer", cascade="all, delete-orphan")
-
     # access_tokens: Mapped[list["AccessToken"]] = relationship(
     #     "AccessToken",
     #     back_populates="user",
